@@ -7,8 +7,6 @@ It includes database schema design, query writing (easy → advanced), and query
 
 ![Spotify Logo](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_logo.jpg)
 
-![Spotify Logo](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_logo.jpg)
-
 ## Overview
 This project involves analyzing a Spotify dataset with various attributes about tracks, albums, and artists using **SQL**. It covers an end-to-end process of normalizing a denormalized dataset, performing SQL queries of varying complexity (easy, medium, and advanced), and optimizing query performance. The primary goals of the project are to practice advanced SQL skills and generate valuable insights from the dataset.
 
@@ -45,139 +43,127 @@ CREATE TABLE spotify (
 ## Project Steps
 
 ### 1. Data Exploration
-Before diving into SQL, itâ€™s important to understand the dataset thoroughly. The dataset contains attributes such as:
+The first step was to understand the dataset thoroughly. The dataset contains attributes such as:
 - `Artist`: The performer of the track.
 - `Track`: The name of the song.
 - `Album`: The album to which the track belongs.
 - `Album_type`: The type of album (e.g., single or album).
-- Various metrics such as `danceability`, `energy`, `loudness`, `tempo`, and more.
+- Audio features such as `danceability`, `energy`, `loudness`, `tempo`, and more.
 
-### 4. Querying the Data
-After the data is inserted, various SQL queries can be written to explore and analyze the data. Queries are categorized into **easy**, **medium**, and **advanced** levels to help progressively develop SQL proficiency.
+### 2. Querying the Data
+After loading the data, SQL queries were written to explore and analyze the dataset. Queries were structured into three difficulty levels to progressively build proficiency:
 
-#### Easy Queries
-- Simple data retrieval, filtering, and basic aggregations.
-  
-#### Medium Queries
-- More complex queries involving grouping, aggregation functions, and joins.
-  
-#### Advanced Queries
-- Nested subqueries, window functions, CTEs, and performance optimization.
+- **Easy** → Basic retrieval, filtering, and aggregations.  
+- **Medium** → Grouping, joins, and more complex aggregations.  
+- **Advanced** → Subqueries, CTEs, window functions, and optimization techniques.  
 
-### 5. Query Optimization
-In advanced stages, the focus shifts to improving query performance. Some optimization strategies include:
-- **Indexing**: Adding indexes on frequently queried columns.
-- **Query Execution Plan**: Using `EXPLAIN ANALYZE` to review and refine query performance.
-  
+### 3. Query Optimization
+At the advanced stage, the focus shifted to improving performance:  
+- **Baseline Analysis**: Used `EXPLAIN ANALYZE` to check query cost and execution time.  
+- **Indexing**: Added indexes on frequently queried columns such as `artist` to improve performance.  
+- **Post-Optimization Check**: Compared execution plans before and after indexing.  
+
+**Result:** Execution time reduced from ~7 ms to ~0.15 ms after indexing.  
+
 ---
 
 ## 15 Practice Questions
 
 ### Easy Level
-1. Retrieve the names of all tracks that have more than 1 billion streams.
-2. List all albums along with their respective artists.
-3. Get the total number of comments for tracks where `licensed = TRUE`.
-4. Find all tracks that belong to the album type `single`.
-5. Count the total number of tracks by each artist.
+1. Retrieve the names of all tracks that have more than 1 billion streams.  
+2. List all albums along with their respective artists.  
+3. Get the total number of comments for tracks where `licensed = TRUE`.  
+4. Find all tracks that belong to the album type `single`.  
+5. Count the total number of tracks by each artist.  
 
 ### Medium Level
-1. Calculate the average danceability of tracks in each album.
-2. Find the top 5 tracks with the highest energy values.
-3. List all tracks along with their views and likes where `official_video = TRUE`.
-4. For each album, calculate the total views of all associated tracks.
-5. Retrieve the track names that have been streamed on Spotify more than YouTube.
+1. Calculate the average danceability of tracks in each album.  
+2. Find the top 5 tracks with the highest energy values.  
+3. List all tracks along with their views and likes where `official_video = TRUE`.  
+4. For each album, calculate the total views of all associated tracks.  
+5. Retrieve the track names that have been streamed on Spotify more than YouTube.  
 
 ### Advanced Level
-1. Find the top 3 most-viewed tracks for each artist using window functions.
-2. Write a query to find tracks where the liveness score is above the average.
-3. **Use a `WITH` clause to calculate the difference between the highest and lowest energy values for tracks in each album.**
+1. Find the top 3 most-viewed tracks for each artist using window functions.  
+2. Write a query to find tracks where the liveness score is above the average.  
+3. Use a `WITH` clause to calculate the difference between the highest and lowest energy values for tracks in each album.  
+
 ```sql
-WITH cte
-AS
-(SELECT 
-	album,
-	MAX(energy) as highest_energy,
-	MIN(energy) as lowest_energery
-FROM spotify
-GROUP BY 1
+WITH cte AS (
+    SELECT 
+        album,
+        MAX(energy) AS highest_energy,
+        MIN(energy) AS lowest_energy
+    FROM spotify
+    GROUP BY album
 )
 SELECT 
-	album,
-	highest_energy - lowest_energery as energy_diff
+    album,
+    highest_energy - lowest_energy AS energy_diff
 FROM cte
-ORDER BY 2 DESC
+ORDER BY energy_diff DESC;
 ```
    
-5. Find tracks where the energy-to-liveness ratio is greater than 1.2.
-6. Calculate the cumulative sum of likes for tracks ordered by the number of views, using window functions.
-
-
-Hereâ€™s an updated section for your **Spotify Advanced SQL Project and Query Optimization** README, focusing on the query optimization task you performed. You can include the specific screenshots and graphs as described.
+5. Find tracks where the energy-to-liveness ratio is greater than 1.2.  
+6. Calculate the cumulative sum of likes for tracks ordered by the number of views using window functions.  
 
 ---
 
 ## Query Optimization Technique 
 
-To improve query performance, we carried out the following optimization process:
+To improve query performance, the following optimization steps were applied:
 
-- **Initial Query Performance Analysis Using `EXPLAIN`**
-    - We began by analyzing the performance of a query using the `EXPLAIN` function.
-    - The query retrieved tracks based on the `artist` column, and the performance metrics were as follows:
-        - Execution time (E.T.): **7 ms**
-        - Planning time (P.T.): **0.17 ms**
-    - Below is the **screenshot** of the `EXPLAIN` result before optimization:
-      ![EXPLAIN Before Index](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_explain_before_index.png)
+- **Initial Query Performance Analysis (`EXPLAIN`)**  
+  - Baseline query tested on the `artist` column.  
+  - Results:  
+    - Execution time: **7 ms**  
+    - Planning time: **0.17 ms**  
+  - ![EXPLAIN Before Index](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_explain_before_index.png)  
 
-- **Index Creation on the `artist` Column**
-    - To optimize the query performance, we created an index on the `artist` column. This ensures faster retrieval of rows where the artist is queried.
-    - **SQL command** for creating the index:
-      ```sql
-      CREATE INDEX idx_artist ON spotify_tracks(artist);
-      ```
+- **Index Creation**  
+  - Added an index on the `artist` column to speed up lookups.  
+  - SQL command:  
+    ```sql
+    CREATE INDEX idx_artist ON spotify_tracks(artist);
+    ```
 
-- **Performance Analysis After Index Creation**
-    - After creating the index, we ran the same query again and observed significant improvements in performance:
-        - Execution time (E.T.): **0.153 ms**
-        - Planning time (P.T.): **0.152 ms**
-    - Below is the **screenshot** of the `EXPLAIN` result after index creation:
-      ![EXPLAIN After Index](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_explain_after_index.png)
+- **Performance After Indexing**  
+  - Execution time reduced to **0.153 ms**  
+  - Planning time reduced to **0.152 ms**  
+  - ![EXPLAIN After Index](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_explain_after_index.png)  
 
-- **Graphical Performance Comparison**
-    - A graph illustrating the comparison between the initial query execution time and the optimized query execution time after index creation.
-    - **Graph view** shows the significant drop in both execution and planning times:
-      ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%203.png)
-      ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%202.png)
-      ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%201.png)
+- **Graphical Performance Comparison**  
+  - Execution and planning times dropped significantly after indexing.  
+  - ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%203.png)  
+  - ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%202.png)  
+  - ![Performance Graph](https://github.com/najirh/najirh-Spotify-Data-Analysis-using-SQL/blob/main/spotify_graphical%20view%201.png)  
 
-This optimization shows how indexing can drastically reduce query time, improving the overall performance of our database operations in the Spotify project.
+**Conclusion:** Indexing drastically improved query performance, reducing execution time from ~7 ms to ~0.15 ms.  
+
 ---
 
 ## Technology Stack
-- **Database**: PostgreSQL
-- **SQL Queries**: DDL, DML, Aggregations, Joins, Subqueries, Window Functions
-- **Tools**: pgAdmin 4 (or any SQL editor), PostgreSQL (via Homebrew, Docker, or direct installation)
+- **Database**: PostgreSQL  
+- **SQL Queries**: DDL, DML, Aggregations, Joins, Subqueries, Window Functions  
+- **Tools**: pgAdmin 4 (or any SQL editor), PostgreSQL installation (Homebrew, Docker, or direct)  
+
+---
 
 ## How to Run the Project
-1. Install PostgreSQL and pgAdmin (if not already installed).
-2. Set up the database schema and tables using the provided normalization structure.
-3. Insert the sample data into the respective tables.
-4. Execute SQL queries to solve the listed problems.
-5. Explore query optimization techniques for large datasets.
+1. Install PostgreSQL and pgAdmin (or any SQL editor).  
+2. Create the database schema and tables using the provided structure.  
+3. Load the dataset into the database.  
+4. Execute SQL queries (easy → medium → advanced).  
+5. Apply indexing and review execution plans for optimization.  
 
 ---
 
 ## Next Steps
-- **Visualize the Data**: Use a data visualization tool like **Tableau** or **Power BI** to create dashboards based on the query results.
-- **Expand Dataset**: Add more rows to the dataset for broader analysis and scalability testing.
-- **Advanced Querying**: Dive deeper into query optimization and explore the performance of SQL queries on larger datasets.
-
----
-
-## Contributing
-If you would like to contribute to this project, feel free to fork the repository, submit pull requests, or raise issues.
+- Build dashboards in **Tableau** or **Power BI** for visualization.  
+- Scale the dataset for broader analysis and testing.  
+- Explore advanced optimization: partitioning, clustering, and composite indexes.  
 
 ---
 
 ## License
 This project is licensed under the MIT License.
-
